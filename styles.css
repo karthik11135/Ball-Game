@@ -24,6 +24,7 @@ body {
 #canvas {
     /* border-radius: 6px; */
     margin: 0 auto;
+
     background-color: blueviolet;
     border: inset 0.7rem solid transparent
 }
