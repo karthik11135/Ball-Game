@@ -3,8 +3,11 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const scoreEl = document.querySelector(".score");
+const highScoreEl = document.querySelector(".high-score");
+const modalEl = document.querySelector(".modal");
+
 function randomIntFromInterval(min, max) {
-  // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
@@ -20,37 +23,12 @@ const spikeFn = () => {
   }
 };
 
-const func = (param) => {
-  return {
-    x: randomIntFromInterval(0, 500),
-    y: randomIntFromInterval(70, 800),
-    width: 100,
-    height: 8,
-    dy: 1,
-  };
-};
-
-console.log(func(8));
-
-// const generateBar = (bar) => {
-//   const bar = {
-//     x: Math.trunc(Math.random() * 600),
-//     y: Math.trunc(Math.random() * 600),
-//     width: 150,
-//     height: 10,
-//     dy: 1,
-//   };
-//   return bar;
-// };
-
-// console.log(generateBar());
-
 const circle = {
   x: 50,
   y: 50,
   size: 20,
-  speed: 2,
-  speedY: 2,
+  speed: 3,
+  speedY: 20,
   dx: 0,
   dy: 0,
 };
@@ -68,7 +46,7 @@ const bar1 = {
 
 const bar2 = {
   x: barXCo,
-  y: barYCo,
+  y: randomIntFromInterval(300, 400),
   width: 100,
   height: 8,
   dy: 1,
@@ -92,7 +70,47 @@ const bar4 = {
 
 const bars = [bar1, bar2, bar3, bar4];
 
+//Drawing the lives
+const chancesInGame = () => {
+  for (let i = 0; i < lives; i++) {
+    ctx.fillStyle = "lightblue";
+    ctx.beginPath();
+    ctx.arc(25 * (i + 1), 50, 10, Math.PI * 2, false);
+    ctx.closePath();
+    ctx.fill();
+  }
+};
+
+let highScore = 0;
+let localStorageArr = [];
+const livesCount = () => {
+  if (lives === 1) {
+    localStorage.setItem(Math.random() * 4000, score);
+    for (let i = 0; i < localStorage.length; i++) {
+      const item = localStorage.getItem(localStorage.key(i));
+      localStorageArr.push(item);
+    }
+
+    highScore = localStorageArr.reduce(function (p, v) {
+      return p > v ? p : v;
+    }); /// Got from stackoverflow for getting max in array
+
+    modalEl.style.display = "block"; //adding the modal window
+    highScoreEl.textContent = highScore; // updating the highscore contnet
+    scoreEl.textContent = score;
+    window.cancelAnimationFrame(); //cancelling animation
+  }
+
+  if (lives !== 0) {
+    // condition if lives are still there
+    circle.x = 50;
+    circle.y = 50;
+    lives--;
+  }
+};
+
 const drawBar = (barsArr) => {
+  // drawing bar in each frame
   barsArr.forEach((bar) => {
     ctx.fillStyle = "cyan";
     ctx.beginPath();
@@ -102,6 +120,7 @@ const drawBar = (barsArr) => {
 };
 
 const holdBall = (barsArr) => {
+  // holding ball when is on the bar
   barsArr.forEach((bar) => {
     bar.y -= bar.dy;
     if (
@@ -119,22 +138,31 @@ const holdBall = (barsArr) => {
 };
 
 const drawCircle = () => {
+  // drawing circle in each frame
   ctx.fillStyle = "brown";
   ctx.beginPath();
   ctx.arc(circle.x, circle.y, circle.size, Math.PI * 2, false);
   ctx.fill();
 };
 
-let i = 0;
+let lives = 3; // initial lives
+let score = 0; // initial score
+let i = 0; //animation frame count
+
+//Main Function
 const update = function () {
-  i++;
+  i++; // num of frames
+  score = Math.trunc(i / 50); // scores based on frame count
+  score = score < 0 ? 0 : score; // to avoid negative value in case
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   spikeFn();
+  chancesInGame();
   drawCircle();
   drawBar(bars);
   holdBall(bars);
 
   if (i % 90 === 0) {
+    // randomly generating the bars
     bars.push({
       x: randomIntFromInterval(0, 500),
       y: randomIntFromInterval(700, 800),
@@ -149,10 +177,11 @@ const update = function () {
 
   if (circle.y + circle.size >= canvas.height) {
     circle.y = canvas.height - circle.size;
+    livesCount(); // lives or chances function
   }
 
   if (circle.y - circle.size === 20) {
-    alert("game over");
+    livesCount();
   }
 
   if (circle.x + circle.size > canvas.width || circle.x - circle.size < 0) {
@@ -164,6 +193,7 @@ const update = function () {
 
 update();
 
+//Function for moving the ball
 const moveRight = () => {
   circle.dx += circle.speed;
 };
@@ -186,5 +216,6 @@ const keyUp = (e) => {
   }
 };
 
+//Event listners
 window.addEventListener("keydown", keyDown);
 window.addEventListener("keyup", keyUp);

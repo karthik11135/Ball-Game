@@ -19,12 +19,33 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* border: 1px solid black; */
 }
 
 #canvas {
-    /* border-radius: 6px; */
     margin: 0 auto;
-
     background-color: blueviolet;
+    border: inset 0.7rem solid transparent;
+
+}
+
+/* #canvas-2 {
+    margin: 0 auto;
+    background-color: rgb(26, 127, 155);
     border: inset 0.7rem solid transparent
+} */
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55rem;
+    border: 1px solid black;
+
+    padding: 1.2rem;
+    margin: 1rem;
+    border-radius: 7px;
+    display: none;
+    background-color: blanchedalmond;
 }
