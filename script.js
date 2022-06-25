@@ -81,34 +81,6 @@ const chancesInGame = () => {
   }
 };
 
-let highScore = 0;
-let localStorageArr = [];
-const livesCount = () => {
-  if (lives === 1) {
-    localStorage.setItem(Math.random() * 4000, score);
-    for (let i = 0; i < localStorage.length; i++) {
-      const item = localStorage.getItem(localStorage.key(i));
-      localStorageArr.push(item);
-    }
-
-    highScore = localStorageArr.reduce(function (p, v) {
-      return p > v ? p : v;
-    }); /// Got from stackoverflow for getting max in array
-
-    modalEl.style.display = "block"; //adding the modal window
-    highScoreEl.textContent = highScore; // updating the highscore contnet
-    scoreEl.textContent = score;
-    window.cancelAnimationFrame(); //cancelling animation
-  }
-
-  if (lives !== 0) {
-    // condition if lives are still there
-    circle.x = 50;
-    circle.y = 50;
-    lives--;
-  }
-};
-
 const drawBar = (barsArr) => {
   // drawing bar in each frame
   barsArr.forEach((bar) => {
@@ -143,6 +115,33 @@ const drawCircle = () => {
   ctx.beginPath();
   ctx.arc(circle.x, circle.y, circle.size, Math.PI * 2, false);
   ctx.fill();
+};
+
+//Lives and Highscore calc with locale storage
+let highScore = 0;
+let localStorageArr = [];
+const livesCount = () => {
+  if (lives === 1) {
+    localStorage.setItem(Math.random() * 4000, score);
+    for (let i = 0; i < localStorage.length; i++) {
+      const item = localStorage.getItem(localStorage.key(i));
+      localStorageArr.push(item);
+    }
+    const sortLocaleStorageArr = localStorageArr.sort((a, b) => a - b); //to get highscore
+    highScore = sortLocaleStorageArr.at(-1);
+
+    modalEl.style.display = "block"; //adding the modal window
+    highScoreEl.textContent = highScore; // updating the highscore contnet
+    scoreEl.textContent = score;
+    window.cancelAnimationFrame(); //cancelling animation
+  }
+
+  if (lives !== 0) {
+    // condition if lives are still there
+    circle.x = 50;
+    circle.y = 50;
+    lives--;
+  }
 };
 
 let lives = 3; // initial lives
